@@ -1,12 +1,31 @@
-// template
-const tintColorLight = "#2f95dc";
-
-export default {
+const Colors = {
+  primary: "#0D9488",
+  primaryLight: "#14B8A6",
+  primaryDark: "#0F766E",
+  accent: "#F97316",
+  accentLight: "#FB923C",
+  danger: "#EF4444",
+  dangerLight: "#FCA5A5",
+  dangerDark: "#DC2626",
+  success: "#22C55E",
+  warning: "#F59E0B",
+  background: "#F0FDFA",
+  surface: "#FFFFFF",
+  surfaceSecondary: "#F1F5F9",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textTertiary: "#94A3B8",
+  border: "#E2E8F0",
+  borderLight: "#F1F5F9",
+  cardShadow: "rgba(15, 23, 42, 0.06)",
+  overlay: "rgba(0, 0, 0, 0.5)",
   light: {
-    text: "#000",
-    background: "#fff",
-    tint: tintColorLight,
-    tabIconDefault: "#ccc",
-    tabIconSelected: tintColorLight,
+    text: "#0F172A",
+    background: "#F0FDFA",
+    tint: "#0D9488",
+    tabIconDefault: "#94A3B8",
+    tabIconSelected: "#0D9488",
   },
 };
+
+export default Colors;
