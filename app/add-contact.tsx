@@ -15,8 +15,10 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { saveEmergencyContact } from "@/lib/storage";
+import { useLanguage } from "@/lib/language-context";
 
 export default function AddContactScreen() {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [relation, setRelation] = useState("");
@@ -36,13 +38,20 @@ export default function AddContactScreen() {
       });
       router.back();
     } catch {
-      Alert.alert("Error", "Failed to save contact. Please try again.");
+      Alert.alert(t("error"), t("failedToSave"));
     } finally {
       setSaving(false);
     }
   };
 
-  const relations = ["Family", "Doctor", "Neighbor", "ASHA Worker", "Friend", "Other"];
+  const relations = [
+    { key: "family", label: t("family") },
+    { key: "doctor", label: t("doctor") },
+    { key: "neighbor", label: t("neighbor") },
+    { key: "asha", label: t("ashaWorker") },
+    { key: "friend", label: t("friend") },
+    { key: "other", label: t("other") },
+  ];
 
   return (
     <KeyboardAvoidingView
@@ -56,7 +65,7 @@ export default function AddContactScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.field}>
-          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.label}>{t("fullName")}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="person-outline" size={18} color={Colors.textTertiary} />
             <TextInput
@@ -70,7 +79,7 @@ export default function AddContactScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Phone Number</Text>
+          <Text style={styles.label}>{t("phoneNumber")}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="call-outline" size={18} color={Colors.textTertiary} />
             <TextInput
@@ -86,16 +95,16 @@ export default function AddContactScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Relationship</Text>
+          <Text style={styles.label}>{t("relationship")}</Text>
           <View style={styles.relationChips}>
             {relations.map((rel) => {
-              const isActive = relation === rel;
+              const isActive = relation === rel.label;
               return (
                 <Pressable
-                  key={rel}
+                  key={rel.key}
                   onPress={() => {
                     if (Platform.OS !== "web") Haptics.selectionAsync();
-                    setRelation(rel);
+                    setRelation(rel.label);
                   }}
                   style={[
                     styles.relationChip,
@@ -108,7 +117,7 @@ export default function AddContactScreen() {
                       isActive && styles.relationChipTextActive,
                     ]}
                   >
-                    {rel}
+                    {rel.label}
                   </Text>
                 </Pressable>
               );
@@ -127,7 +136,7 @@ export default function AddContactScreen() {
         >
           <Ionicons name="checkmark" size={20} color="#fff" />
           <Text style={styles.saveButtonText}>
-            {saving ? "Saving..." : "Save Contact"}
+            {saving ? t("saving") : t("saveContact")}
           </Text>
         </Pressable>
       </ScrollView>
@@ -136,80 +145,18 @@ export default function AddContactScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    padding: 20,
-    gap: 20,
-  },
-  field: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: "Nunito_700Bold",
-    color: Colors.text,
-  },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    paddingHorizontal: 14,
-    gap: 10,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 14,
-    fontSize: 15,
-    fontFamily: "Nunito_500Medium",
-    color: Colors.text,
-  },
-  relationChips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  relationChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-  },
-  relationChipActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  relationChipText: {
-    fontSize: 14,
-    fontFamily: "Nunito_600SemiBold",
-    color: Colors.textSecondary,
-  },
-  relationChipTextActive: {
-    color: "#fff",
-  },
-  saveButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: Colors.primary,
-    borderRadius: 14,
-    paddingVertical: 16,
-    marginTop: 12,
-  },
-  saveButtonDisabled: {
-    opacity: 0.5,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontFamily: "Nunito_700Bold",
-    color: "#fff",
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
+  content: { padding: 20, gap: 20 },
+  field: { gap: 8 },
+  label: { fontSize: 14, fontFamily: "Nunito_700Bold", color: Colors.text },
+  inputWrapper: { flexDirection: "row", alignItems: "center", backgroundColor: Colors.surface, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.border, paddingHorizontal: 14, gap: 10 },
+  input: { flex: 1, paddingVertical: 14, fontSize: 15, fontFamily: "Nunito_500Medium", color: Colors.text },
+  relationChips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  relationChip: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border },
+  relationChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  relationChipText: { fontSize: 14, fontFamily: "Nunito_600SemiBold", color: Colors.textSecondary },
+  relationChipTextActive: { color: "#fff" },
+  saveButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: Colors.primary, borderRadius: 14, paddingVertical: 16, marginTop: 12 },
+  saveButtonDisabled: { opacity: 0.5 },
+  saveButtonText: { fontSize: 16, fontFamily: "Nunito_700Bold", color: "#fff" },
 });

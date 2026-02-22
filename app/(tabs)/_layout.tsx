@@ -6,17 +6,19 @@ import { Platform, StyleSheet, useColorScheme, View } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import Colors from "@/constants/colors";
+import { useLanguage } from "@/lib/language-context";
 
 function NativeTabLayout() {
+  const { t } = useLanguage();
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: "house", selected: "house.fill" }} />
-        <Label>Home</Label>
+        <Label>{t("home")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="health-hub">
         <Icon sf={{ default: "book", selected: "book.fill" }} />
-        <Label>Health Hub</Label>
+        <Label>{t("healthHub")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="sos">
         <Icon sf={{ default: "sos.circle", selected: "sos.circle.fill" }} />
@@ -32,6 +34,7 @@ function NativeTabLayout() {
 
 function ClassicTabLayout() {
   const colorScheme = useColorScheme();
+  const { t } = useLanguage();
   const isDark = colorScheme === "dark";
   const isWeb = Platform.OS === "web";
   const isIOS = Platform.OS === "ios";
@@ -74,7 +77,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t("home"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -83,7 +86,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="health-hub"
         options={{
-          title: "Health Hub",
+          title: t("healthHub"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="book" size={size} color={color} />
           ),

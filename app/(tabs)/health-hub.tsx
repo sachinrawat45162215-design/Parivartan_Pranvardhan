@@ -15,26 +15,24 @@ import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import {
   healthArticles,
-  categoryLabels,
   categoryColors,
   type HealthArticle,
 } from "@/lib/health-data";
 import { getSavedArticles } from "@/lib/storage";
+import { useLanguage } from "@/lib/language-context";
 
 type CategoryFilter = HealthArticle["category"] | "all";
 
-const categories: { key: CategoryFilter; label: string; icon: string }[] = [
-  { key: "all", label: "All", icon: "apps" },
-  { key: "hygiene", label: "Hygiene", icon: "water-outline" },
-  { key: "nutrition", label: "Nutrition", icon: "nutrition-outline" },
-  { key: "maternal", label: "Maternal", icon: "heart-outline" },
-  { key: "vaccination", label: "Vaccines", icon: "shield-checkmark-outline" },
-  { key: "chronic", label: "Chronic", icon: "fitness-outline" },
-  { key: "child", label: "Child", icon: "happy-outline" },
-];
-
-function ArticleCard({ article, isSaved }: { article: HealthArticle; isSaved: boolean }) {
+function ArticleCard({ article, isSaved, t }: { article: HealthArticle; isSaved: boolean; t: (key: any) => any }) {
   const catColor = categoryColors[article.category];
+  const categoryLabelMap: Record<string, string> = {
+    hygiene: t("categoryHygiene"),
+    nutrition: t("categoryNutrition"),
+    maternal: t("categoryMaternal"),
+    vaccination: t("categoryVaccination"),
+    chronic: t("categoryChronic"),
+    child: t("categoryChild"),
+  };
 
   return (
     <Pressable
@@ -58,10 +56,10 @@ function ArticleCard({ article, isSaved }: { article: HealthArticle; isSaved: bo
         <View style={styles.articleMeta}>
           <View style={[styles.categoryBadge, { backgroundColor: catColor + "15" }]}>
             <Text style={[styles.categoryBadgeText, { color: catColor }]}>
-              {categoryLabels[article.category]}
+              {categoryLabelMap[article.category]}
             </Text>
           </View>
-          <Text style={styles.readTime}>{article.readTime} min read</Text>
+          <Text style={styles.readTime}>{article.readTime} {t("minRead")}</Text>
         </View>
         <Text style={styles.articleTitle} numberOfLines={2}>{article.title}</Text>
         <Text style={styles.articleSummary} numberOfLines={2}>{article.summary}</Text>
@@ -75,6 +73,7 @@ function ArticleCard({ article, isSaved }: { article: HealthArticle; isSaved: bo
 
 export default function HealthHubScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const webTopInset = Platform.OS === "web" ? 67 : 0;
@@ -82,6 +81,16 @@ export default function HealthHubScreen() {
   useEffect(() => {
     getSavedArticles().then(setSavedIds);
   }, []);
+
+  const categories: { key: CategoryFilter; label: string; icon: string }[] = [
+    { key: "all", label: t("all"), icon: "apps" },
+    { key: "hygiene", label: t("hygiene"), icon: "water-outline" },
+    { key: "nutrition", label: t("nutrition"), icon: "nutrition-outline" },
+    { key: "maternal", label: t("maternal"), icon: "heart-outline" },
+    { key: "vaccination", label: t("vaccines"), icon: "shield-checkmark-outline" },
+    { key: "chronic", label: t("chronic"), icon: "fitness-outline" },
+    { key: "child", label: t("child"), icon: "happy-outline" },
+  ];
 
   const filteredArticles =
     activeCategory === "all"
@@ -91,9 +100,9 @@ export default function HealthHubScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + webTopInset + 12 }]}>
-        <Text style={styles.headerTitle}>Health Awareness</Text>
+        <Text style={styles.headerTitle}>{t("healthAwareness")}</Text>
         <Text style={styles.headerSubtitle}>
-          {filteredArticles.length} articles available
+          {filteredArticles.length} {t("articlesAvailable")}
         </Text>
       </View>
 
@@ -139,7 +148,7 @@ export default function HealthHubScreen() {
         data={filteredArticles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ArticleCard article={item} isSaved={savedIds.includes(item.id)} />
+          <ArticleCard article={item} isSaved={savedIds.includes(item.id)} t={t} />
         )}
         contentContainerStyle={[
           styles.listContent,
@@ -150,7 +159,7 @@ export default function HealthHubScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="document-text-outline" size={48} color={Colors.textTertiary} />
-            <Text style={styles.emptyText}>No articles in this category</Text>
+            <Text style={styles.emptyText}>{t("noArticlesCategory")}</Text>
           </View>
         }
       />

@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { queryClient } from "@/lib/query-client";
+import { LanguageProvider } from "@/lib/language-context";
 import {
   useFonts,
   Nunito_400Regular,
@@ -18,6 +19,7 @@ import {
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
+  const { t } = useLanguage();
   return (
     <Stack screenOptions={{ headerBackTitle: "Back" }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -35,7 +37,7 @@ function RootLayoutNav() {
         name="symptom-checker"
         options={{
           headerShown: true,
-          headerTitle: "Symptom Checker",
+          headerTitle: t("symptomChecker"),
           headerBackTitle: "Back",
           headerTintColor: "#0D9488",
           headerShadowVisible: false,
@@ -46,7 +48,7 @@ function RootLayoutNav() {
         name="add-visit"
         options={{
           headerShown: true,
-          headerTitle: "Log Patient Visit",
+          headerTitle: t("logPatientVisit"),
           headerBackTitle: "Back",
           headerTintColor: "#0D9488",
           headerShadowVisible: false,
@@ -58,7 +60,7 @@ function RootLayoutNav() {
         name="add-contact"
         options={{
           headerShown: true,
-          headerTitle: "Add Emergency Contact",
+          headerTitle: t("addEmergencyContact"),
           headerBackTitle: "Back",
           headerTintColor: "#0D9488",
           headerShadowVisible: false,
@@ -90,11 +92,13 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <GestureHandlerRootView>
-          <KeyboardProvider>
-            <RootLayoutNav />
-          </KeyboardProvider>
-        </GestureHandlerRootView>
+        <LanguageProvider>
+          <GestureHandlerRootView>
+            <KeyboardProvider>
+              <RootLayoutNav />
+            </KeyboardProvider>
+          </GestureHandlerRootView>
+        </LanguageProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

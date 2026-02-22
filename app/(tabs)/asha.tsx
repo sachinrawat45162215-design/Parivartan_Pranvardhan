@@ -16,26 +16,29 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { getPatientVisits, deletePatientVisit, type PatientVisit } from "@/lib/storage";
+import { useLanguage } from "@/lib/language-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-const categoryConfig: Record<
-  PatientVisit["category"],
-  { label: string; color: string; icon: string }
-> = {
-  general: { label: "General", color: Colors.primary, icon: "person" },
-  maternal: { label: "Maternal", color: "#EC4899", icon: "baby-carriage" },
-  chronic: { label: "Chronic", color: Colors.accent, icon: "heart-pulse" },
-  child: { label: "Child", color: "#06B6D4", icon: "baby-face-outline" },
-};
 
 function VisitCard({
   visit,
   onDelete,
+  t,
 }: {
   visit: PatientVisit;
   onDelete: () => void;
+  t: (key: any) => any;
 }) {
+  const categoryConfig: Record<
+    PatientVisit["category"],
+    { label: string; color: string; icon: string }
+  > = {
+    general: { label: t("general"), color: Colors.primary, icon: "person" },
+    maternal: { label: t("maternal"), color: "#EC4899", icon: "baby-carriage" },
+    chronic: { label: t("chronic"), color: Colors.accent, icon: "heart-pulse" },
+    child: { label: t("child"), color: "#06B6D4", icon: "baby-face-outline" },
+  };
+
   const config = categoryConfig[visit.category];
   const visitDate = new Date(visit.visitDate);
   const dateStr = visitDate.toLocaleDateString("en-IN", {
@@ -54,9 +57,9 @@ function VisitCard({
         <Text style={styles.visitDate}>{dateStr}</Text>
         <Pressable
           onPress={() => {
-            Alert.alert("Delete Visit", "Are you sure?", [
-              { text: "Cancel", style: "cancel" },
-              { text: "Delete", style: "destructive", onPress: onDelete },
+            Alert.alert(t("deleteVisit"), t("areYouSure"), [
+              { text: t("cancel"), style: "cancel" },
+              { text: t("delete"), style: "destructive", onPress: onDelete },
             ]);
           }}
           hitSlop={8}
@@ -74,7 +77,7 @@ function VisitCard({
         <Text style={styles.visitVillage}>{visit.village}</Text>
         {visit.symptoms ? (
           <View style={styles.visitField}>
-            <Text style={styles.visitFieldLabel}>Symptoms:</Text>
+            <Text style={styles.visitFieldLabel}>{t("symptoms")}:</Text>
             <Text style={styles.visitFieldValue} numberOfLines={2}>
               {visit.symptoms}
             </Text>
@@ -82,7 +85,7 @@ function VisitCard({
         ) : null}
         {visit.diagnosis ? (
           <View style={styles.visitField}>
-            <Text style={styles.visitFieldLabel}>Diagnosis:</Text>
+            <Text style={styles.visitFieldLabel}>{t("diagnosis")}:</Text>
             <Text style={styles.visitFieldValue} numberOfLines={1}>
               {visit.diagnosis}
             </Text>
@@ -92,7 +95,7 @@ function VisitCard({
           <View style={styles.followUpBadge}>
             <Ionicons name="calendar-outline" size={12} color={Colors.accent} />
             <Text style={styles.followUpText}>
-              Follow-up:{" "}
+              {t("followUp")}:{" "}
               {new Date(visit.followUpDate).toLocaleDateString("en-IN", {
                 day: "numeric",
                 month: "short",
@@ -107,6 +110,7 @@ function VisitCard({
 
 export default function ASHAScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
   const [visits, setVisits] = useState<PatientVisit[]>([]);
   const [filterCategory, setFilterCategory] = useState<PatientVisit["category"] | "all">("all");
   const webTopInset = Platform.OS === "web" ? 67 : 0;
@@ -150,8 +154,8 @@ export default function ASHAScreen() {
     >
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>ASHA Dashboard</Text>
-          <Text style={styles.headerSubtitle}>Community Health Worker Panel</Text>
+          <Text style={styles.headerTitle}>{t("ashaDashboard")}</Text>
+          <Text style={styles.headerSubtitle}>{t("communityHealthWorker")}</Text>
         </View>
         <Pressable
           onPress={() => {
@@ -176,18 +180,18 @@ export default function ASHAScreen() {
         >
           <MaterialCommunityIcons name="clipboard-list" size={24} color="#fff" />
           <Text style={styles.statValueWhite}>{stats.total}</Text>
-          <Text style={styles.statLabelWhite}>Total Visits</Text>
+          <Text style={styles.statLabelWhite}>{t("totalVisits")}</Text>
         </LinearGradient>
         <View style={styles.statsCol}>
           <View style={styles.statCardSmall}>
             <MaterialCommunityIcons name="baby-carriage" size={18} color="#EC4899" />
             <Text style={styles.statValueSmall}>{stats.maternal}</Text>
-            <Text style={styles.statLabelSmall}>Maternal</Text>
+            <Text style={styles.statLabelSmall}>{t("maternal")}</Text>
           </View>
           <View style={styles.statCardSmall}>
             <MaterialCommunityIcons name="heart-pulse" size={18} color={Colors.accent} />
             <Text style={styles.statValueSmall}>{stats.chronic}</Text>
-            <Text style={styles.statLabelSmall}>Chronic</Text>
+            <Text style={styles.statLabelSmall}>{t("chronic")}</Text>
           </View>
         </View>
       </View>
@@ -196,7 +200,7 @@ export default function ASHAScreen() {
         <View style={styles.followUpAlert}>
           <Ionicons name="notifications" size={18} color={Colors.accent} />
           <Text style={styles.followUpAlertText}>
-            {stats.followUps} pending follow-up{stats.followUps > 1 ? "s" : ""}
+            {stats.followUps} {stats.followUps > 1 ? t("pendingFollowUps") : t("pendingFollowUp")}
           </Text>
         </View>
       )}
@@ -208,11 +212,11 @@ export default function ASHAScreen() {
         style={styles.filterContainer}
       >
         {[
-          { key: "all" as const, label: "All" },
-          { key: "general" as const, label: "General" },
-          { key: "maternal" as const, label: "Maternal" },
-          { key: "chronic" as const, label: "Chronic" },
-          { key: "child" as const, label: "Child" },
+          { key: "all" as const, label: t("all") },
+          { key: "general" as const, label: t("general") },
+          { key: "maternal" as const, label: t("maternal") },
+          { key: "chronic" as const, label: t("chronic") },
+          { key: "child" as const, label: t("child") },
         ].map((f) => {
           const isActive = filterCategory === f.key;
           return (
@@ -230,7 +234,7 @@ export default function ASHAScreen() {
       </ScrollView>
 
       <Text style={styles.sectionTitle}>
-        Patient Visits ({filteredVisits.length})
+        {t("patientVisits")} ({filteredVisits.length})
       </Text>
 
       {filteredVisits.length === 0 ? (
@@ -240,10 +244,8 @@ export default function ASHAScreen() {
             size={48}
             color={Colors.textTertiary}
           />
-          <Text style={styles.emptyText}>No patient visits recorded</Text>
-          <Text style={styles.emptySubtext}>
-            Tap + to log your first patient visit
-          </Text>
+          <Text style={styles.emptyText}>{t("noVisitsRecorded")}</Text>
+          <Text style={styles.emptySubtext}>{t("tapToLogVisit")}</Text>
         </View>
       ) : (
         <View style={styles.visitsList}>
@@ -252,6 +254,7 @@ export default function ASHAScreen() {
               key={visit.id}
               visit={visit}
               onDelete={() => handleDelete(visit.id)}
+              t={t}
             />
           ))}
         </View>

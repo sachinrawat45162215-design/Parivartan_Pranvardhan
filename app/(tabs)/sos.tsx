@@ -24,15 +24,18 @@ import Animated, {
 } from "react-native-reanimated";
 import Colors from "@/constants/colors";
 import { getEmergencyContacts, deleteEmergencyContact, type EmergencyContact } from "@/lib/storage";
+import { useLanguage } from "@/lib/language-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 function EmergencyContactCard({
   contact,
   onDelete,
+  t,
 }: {
   contact: EmergencyContact;
   onDelete: () => void;
+  t: (key: any) => any;
 }) {
   const handleCall = () => {
     const phoneUrl = `tel:${contact.phone}`;
@@ -40,7 +43,7 @@ function EmergencyContactCard({
       if (supported) {
         Linking.openURL(phoneUrl);
       } else {
-        Alert.alert("Cannot make call", "Phone calling is not supported on this device.");
+        Alert.alert(t("cannotMakeCall"), t("callNotSupported"));
       }
     });
   };
@@ -67,9 +70,9 @@ function EmergencyContactCard({
         </Pressable>
         <Pressable
           onPress={() => {
-            Alert.alert("Remove Contact", `Remove ${contact.name}?`, [
-              { text: "Cancel", style: "cancel" },
-              { text: "Remove", style: "destructive", onPress: onDelete },
+            Alert.alert(t("removeContact"), `${contact.name}?`, [
+              { text: t("cancel"), style: "cancel" },
+              { text: t("remove"), style: "destructive", onPress: onDelete },
             ]);
           }}
           style={({ pressed }) => [
@@ -86,6 +89,7 @@ function EmergencyContactCard({
 
 export default function SOSScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const pulseScale = useSharedValue(1);
   const webTopInset = Platform.OS === "web" ? 67 : 0;
@@ -121,8 +125,8 @@ export default function SOSScreen() {
         Linking.openURL(phoneUrl);
       } else {
         Alert.alert(
-          "Emergency - Call 108",
-          "Dial 108 for ambulance service. This is a free service available 24/7.",
+          `${t("emergency")} - Call 108`,
+          t("emergencyInfo108"),
           [{ text: "OK" }]
         );
       }
@@ -135,10 +139,10 @@ export default function SOSScreen() {
   };
 
   const emergencyNumbers = [
-    { name: "Ambulance", number: "108", icon: "ambulance" as const, color: Colors.danger },
-    { name: "Health Helpline", number: "104", icon: "phone-in-talk" as const, color: Colors.primary },
-    { name: "Women Helpline", number: "181", icon: "shield-account" as const, color: "#EC4899" },
-    { name: "Police", number: "100", icon: "police-badge" as const, color: "#3B82F6" },
+    { name: t("ambulance"), number: "108", icon: "ambulance" as const, color: Colors.danger },
+    { name: t("healthHelpline"), number: "104", icon: "phone-in-talk" as const, color: Colors.primary },
+    { name: t("womenHelpline"), number: "181", icon: "shield-account" as const, color: "#EC4899" },
+    { name: t("police"), number: "100", icon: "police-badge" as const, color: "#3B82F6" },
   ];
 
   return (
@@ -153,10 +157,8 @@ export default function SOSScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.headerTitle}>Emergency</Text>
-      <Text style={styles.headerSubtitle}>
-        Quick access to emergency services
-      </Text>
+      <Text style={styles.headerTitle}>{t("emergency")}</Text>
+      <Text style={styles.headerSubtitle}>{t("quickAccessEmergency")}</Text>
 
       <View style={styles.sosSection}>
         <Animated.View style={[styles.sosOuterRing, pulseStyle]}>
@@ -172,14 +174,14 @@ export default function SOSScreen() {
               style={styles.sosGradient}
             >
               <MaterialCommunityIcons name="phone-alert" size={40} color="#fff" />
-              <Text style={styles.sosText}>SOS</Text>
-              <Text style={styles.sosSubtext}>Tap to call 108</Text>
+              <Text style={styles.sosText}>{t("sos")}</Text>
+              <Text style={styles.sosSubtext}>{t("tapToCall108")}</Text>
             </LinearGradient>
           </Pressable>
         </Animated.View>
       </View>
 
-      <Text style={styles.sectionTitle}>Emergency Numbers</Text>
+      <Text style={styles.sectionTitle}>{t("emergencyNumbers")}</Text>
       <View style={styles.numbersGrid}>
         {emergencyNumbers.map((item) => (
           <Pressable
@@ -187,7 +189,7 @@ export default function SOSScreen() {
             onPress={() => {
               if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               Linking.openURL(`tel:${item.number}`).catch(() => {
-                Alert.alert(`Call ${item.name}`, `Dial ${item.number}`);
+                Alert.alert(`${item.name}`, `${item.number}`);
               });
             }}
             style={({ pressed }) => [
@@ -205,7 +207,7 @@ export default function SOSScreen() {
       </View>
 
       <View style={styles.contactsHeader}>
-        <Text style={styles.sectionTitle}>Emergency Contacts</Text>
+        <Text style={styles.sectionTitle}>{t("emergencyContacts")}</Text>
         <Pressable
           onPress={() => {
             if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -217,17 +219,15 @@ export default function SOSScreen() {
           ]}
         >
           <Ionicons name="add" size={20} color={Colors.primary} />
-          <Text style={styles.addButtonText}>Add</Text>
+          <Text style={styles.addButtonText}>{t("add")}</Text>
         </Pressable>
       </View>
 
       {contacts.length === 0 ? (
         <View style={styles.emptyContacts}>
           <Ionicons name="people-outline" size={40} color={Colors.textTertiary} />
-          <Text style={styles.emptyText}>No emergency contacts added</Text>
-          <Text style={styles.emptySubtext}>
-            Add family or doctor contacts for quick access during emergencies
-          </Text>
+          <Text style={styles.emptyText}>{t("noEmergencyContacts")}</Text>
+          <Text style={styles.emptySubtext}>{t("addContactsDesc")}</Text>
         </View>
       ) : (
         <View style={styles.contactsList}>
@@ -236,6 +236,7 @@ export default function SOSScreen() {
               key={contact.id}
               contact={contact}
               onDelete={() => handleDeleteContact(contact.id)}
+              t={t}
             />
           ))}
         </View>
@@ -243,9 +244,7 @@ export default function SOSScreen() {
 
       <View style={styles.infoCard}>
         <Ionicons name="information-circle" size={20} color={Colors.primary} />
-        <Text style={styles.infoText}>
-          108 is India's free emergency ambulance service available 24/7. It operates in all states.
-        </Text>
+        <Text style={styles.infoText}>{t("emergencyInfo108")}</Text>
       </View>
     </ScrollView>
   );

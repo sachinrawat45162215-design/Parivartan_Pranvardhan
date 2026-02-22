@@ -14,19 +14,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
+import { useLanguage } from "@/lib/language-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-const healthTips = [
-  "Wash hands with soap for 20 seconds before eating and after using the toilet.",
-  "Drink at least 8 glasses of clean water daily to stay hydrated.",
-  "Walk for 30 minutes every day to keep your heart healthy.",
-  "Eat seasonal fruits and vegetables for better nutrition.",
-  "Get your children vaccinated on time at the nearest health center.",
-  "Sleep 7-8 hours every night for better health and immunity.",
-  "Use mosquito nets to protect from malaria and dengue.",
-  "Exclusive breastfeeding for 6 months gives the best start to babies.",
-];
 
 interface QuickActionProps {
   icon: React.ReactNode;
@@ -77,8 +67,11 @@ function StatCard({ icon, value, label, color }: StatCardProps) {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { lang, setLanguage, t } = useLanguage();
   const [tipIndex, setTipIndex] = useState(0);
   const webTopInset = Platform.OS === "web" ? 67 : 0;
+
+  const healthTips = t("healthTips") as string[];
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * healthTips.length);
@@ -96,15 +89,31 @@ export default function HomeScreen() {
         },
       ]}
       showsVerticalScrollIndicator={false}
-      contentInsetAdjustmentBehavior="automatic"
     >
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Namaste</Text>
-          <Text style={styles.subtitle}>Your health companion</Text>
+          <Text style={styles.greeting}>{t("namaste")}</Text>
+          <Text style={styles.subtitle}>{t("yourHealthCompanion")}</Text>
         </View>
-        <View style={styles.logoCircle}>
-          <MaterialCommunityIcons name="heart-pulse" size={24} color={Colors.primary} />
+        <View style={styles.headerRight}>
+          <Pressable
+            onPress={() => {
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setLanguage(lang === "en" ? "hi" : "en");
+            }}
+            style={({ pressed }) => [
+              styles.langToggle,
+              { opacity: pressed ? 0.8 : 1 },
+            ]}
+          >
+            <Ionicons name="language" size={16} color={Colors.primary} />
+            <Text style={styles.langToggleText}>
+              {lang === "en" ? "हिंदी" : "ENG"}
+            </Text>
+          </Pressable>
+          <View style={styles.logoCircle}>
+            <MaterialCommunityIcons name="heart-pulse" size={24} color={Colors.primary} />
+          </View>
         </View>
       </View>
 
@@ -116,7 +125,7 @@ export default function HomeScreen() {
       >
         <View style={styles.tipHeader}>
           <Ionicons name="bulb" size={20} color="#FCD34D" />
-          <Text style={styles.tipLabel}>Daily Health Tip</Text>
+          <Text style={styles.tipLabel}>{t("dailyHealthTip")}</Text>
         </View>
         <Text style={styles.tipText}>{healthTips[tipIndex]}</Text>
         <Pressable
@@ -130,43 +139,43 @@ export default function HomeScreen() {
           ]}
         >
           <Feather name="refresh-cw" size={14} color="#fff" />
-          <Text style={styles.tipButtonText}>Next Tip</Text>
+          <Text style={styles.tipButtonText}>{t("nextTip")}</Text>
         </Pressable>
       </LinearGradient>
 
-      <Text style={styles.sectionTitle}>Quick Access</Text>
+      <Text style={styles.sectionTitle}>{t("quickAccess")}</Text>
       <View style={styles.quickActions}>
         <QuickAction
           icon={<MaterialCommunityIcons name="stethoscope" size={26} color={Colors.primary} />}
-          label="Check Symptoms"
+          label={t("checkSymptoms")}
           color={Colors.primary}
           bgColor={Colors.primary + "15"}
           onPress={() => router.push("/symptom-checker")}
         />
         <QuickAction
           icon={<MaterialCommunityIcons name="alarm-light" size={26} color={Colors.danger} />}
-          label="Emergency SOS"
+          label={t("emergencySOS")}
           color={Colors.danger}
           bgColor={Colors.danger + "15"}
           onPress={() => router.push("/(tabs)/sos")}
         />
         <QuickAction
           icon={<Ionicons name="book" size={26} color="#8B5CF6" />}
-          label="Health Hub"
+          label={t("healthHub")}
           color="#8B5CF6"
           bgColor="#8B5CF615"
           onPress={() => router.push("/(tabs)/health-hub")}
         />
         <QuickAction
           icon={<MaterialCommunityIcons name="account-heart" size={26} color={Colors.accent} />}
-          label="ASHA Panel"
+          label={t("ashaPanel")}
           color={Colors.accent}
           bgColor={Colors.accent + "15"}
           onPress={() => router.push("/(tabs)/asha")}
         />
       </View>
 
-      <Text style={styles.sectionTitle}>Health Services</Text>
+      <Text style={styles.sectionTitle}>{t("healthServices")}</Text>
       <View style={styles.serviceCards}>
         <Pressable
           onPress={() => router.push("/(tabs)/health-hub")}
@@ -180,8 +189,8 @@ export default function HomeScreen() {
             style={styles.serviceGradient}
           >
             <MaterialCommunityIcons name="baby-carriage" size={32} color="#059669" />
-            <Text style={styles.serviceCardTitle}>Maternal Care</Text>
-            <Text style={styles.serviceCardDesc}>Prenatal, delivery & postnatal guides</Text>
+            <Text style={styles.serviceCardTitle}>{t("maternalCare")}</Text>
+            <Text style={styles.serviceCardDesc}>{t("prenatalGuides")}</Text>
           </LinearGradient>
         </Pressable>
         <Pressable
@@ -196,8 +205,8 @@ export default function HomeScreen() {
             style={styles.serviceGradient}
           >
             <Ionicons name="shield-checkmark" size={32} color="#2563EB" />
-            <Text style={styles.serviceCardTitle}>Vaccination</Text>
-            <Text style={styles.serviceCardDesc}>Child immunization schedule & info</Text>
+            <Text style={styles.serviceCardTitle}>{t("vaccination")}</Text>
+            <Text style={styles.serviceCardDesc}>{t("childImmunization")}</Text>
           </LinearGradient>
         </Pressable>
       </View>
@@ -213,32 +222,30 @@ export default function HomeScreen() {
           <Ionicons name="megaphone" size={24} color="#7C3AED" />
         </View>
         <View style={styles.govSchemeContent}>
-          <Text style={styles.govSchemeTitle}>Government Health Schemes</Text>
-          <Text style={styles.govSchemeDesc}>
-            Learn about Ayushman Bharat, JSY, JSSK and more free healthcare benefits
-          </Text>
+          <Text style={styles.govSchemeTitle}>{t("govHealthSchemes")}</Text>
+          <Text style={styles.govSchemeDesc}>{t("govHealthSchemesDesc")}</Text>
         </View>
         <Feather name="chevron-right" size={20} color={Colors.textTertiary} />
       </Pressable>
 
-      <Text style={styles.sectionTitle}>Quick Stats</Text>
+      <Text style={styles.sectionTitle}>{t("quickStats")}</Text>
       <View style={styles.statsRow}>
         <StatCard
           icon={<Ionicons name="call" size={18} color={Colors.danger} />}
           value="108"
-          label="Ambulance"
+          label={t("ambulance")}
           color={Colors.danger}
         />
         <StatCard
           icon={<MaterialCommunityIcons name="hospital-building" size={18} color={Colors.primary} />}
           value="104"
-          label="Health Helpline"
+          label={t("healthHelpline")}
           color={Colors.primary}
         />
         <StatCard
           icon={<Ionicons name="woman" size={18} color="#EC4899" />}
           value="1098"
-          label="Child Helpline"
+          label={t("childHelpline")}
           color="#EC4899"
         />
       </View>
@@ -270,6 +277,27 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_500Medium",
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  langToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.primary + "15",
+    borderWidth: 1,
+    borderColor: Colors.primary + "30",
+  },
+  langToggleText: {
+    fontSize: 13,
+    fontFamily: "Nunito_700Bold",
+    color: Colors.primary,
   },
   logoCircle: {
     width: 48,
