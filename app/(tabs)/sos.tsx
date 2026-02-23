@@ -142,7 +142,7 @@ export default function SOSScreen() {
     { name: t("ambulance"), number: "108", icon: "ambulance" as const, color: Colors.danger },
     { name: t("healthHelpline"), number: "104", icon: "phone-in-talk" as const, color: Colors.primary },
     { name: t("womenHelpline"), number: "181", icon: "shield-account" as const, color: "#EC4899" },
-    { name: t("police"), number: "100", icon: "police-badge" as const, color: "#3B82F6" },
+    { name: t("police"), number: "112", icon: "police-badge" as const, color: "#3B82F6" },
   ];
 
   return (
