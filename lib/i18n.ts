@@ -186,6 +186,18 @@ export const translations = {
     categoryChronic: "Chronic Disease",
     categoryChild: "Child Health",
 
+    nearbyHospitals: "Nearby Hospitals",
+    findHospitals: "Find hospitals",
+    findHospitalsDesc: "City-wise hospital directory with location & contact",
+    governmentType: "Government",
+    privateType: "Private",
+    phcType: "PHC/CHC",
+    hospitalsIn: "hospitals in",
+    cities: "cities",
+    callNow: "Call",
+    viewOnMap: "Map",
+    noHospitalsFound: "No hospitals found for this filter",
+
     healthTips: [
       "Wash hands with soap for 20 seconds before eating and after using the toilet.",
       "Drink at least 8 glasses of clean water daily to stay hydrated.",
